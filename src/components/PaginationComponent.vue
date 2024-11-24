@@ -1,4 +1,3 @@
-<!-- src/components/PaginationComponent.vue -->
 <template>
   <div class="pagination">
     <button
@@ -57,14 +56,13 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
 }
-
 .pagination button {
   margin: 0 10px;
 }

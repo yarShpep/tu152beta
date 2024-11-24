@@ -1,4 +1,3 @@
-// .eslintrc.js
 module.exports = {
     root: true,
     env: {
@@ -9,10 +8,13 @@ module.exports = {
         'eslint:recommended',
     ],
     parserOptions: {
+        parser: '@babel/eslint-parser',
         ecmaVersion: 2020,
+        sourceType: 'module',
     },
     rules: {
-        // Ваши пользовательские правила
-        'vue/multi-word-component-names': 'off',
+        'vue/multi-word-component-names': 'off', // Отключаем правило, если необходимо
+        'no-undef': 'off' // Отключаем, если используем глобальные переменные или другие методы
+        // Добавьте другие правила по необходимости
     },
 };

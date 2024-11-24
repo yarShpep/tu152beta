@@ -1,4 +1,3 @@
-<!-- src/components/AddEntry.vue -->
 <template>
   <div class="add-entry">
     <h2>Добавить новую запись</h2>
@@ -33,10 +32,12 @@ export default {
     const router = useRouter();
 
     const columns = [
-      { id: '1', name: 'Дата, время, станция смены локомотивной бригады' },
-      { id: '2.1', name: 'Фамилия машиниста Прибывшего' },
-      { id: '2.2', name: 'Фамилия машиниста Отправляющегося' },
-      // Добавьте остальные столбцы
+      { id: '1', name: 'Дата, время (час, мин.), станция смены локомотивной бригады' },
+      { id: '2', name: 'Фамилия машиниста' },
+      { id: '3', name: 'Наличие топлива в момент приемки' },
+      { id: '4', name: 'Замечания и неисправности' },
+      { id: '5', name: 'Дата устранения неисправности' },
+      // Добавьте остальные столбцы, если необходимо
     ];
 
     const isColumnFilled = (columnId) => {
@@ -48,11 +49,13 @@ export default {
     });
 
     const saveEntry = () => {
+      console.log('Кнопка "Сохранить" на странице AddEntry нажата');
       store.dispatch('addEntry');
       router.push('/');
     };
 
     const cancel = () => {
+      console.log('Кнопка "Отменить" на странице AddEntry нажата');
       store.commit('RESET_CURRENT_ENTRY');
       router.push('/');
     };
@@ -68,8 +71,15 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .add-entry {
   padding: 20px;
+}
+.add-entry ul {
+  list-style-type: none;
+  padding: 0;
+}
+.add-entry li {
+  margin-bottom: 10px;
 }
 </style>

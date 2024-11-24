@@ -1,5 +1,3 @@
-/* src/styles/global.css */
-
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -52,4 +50,27 @@ button {
     button {
         font-size: 14px;
     }
+}
+
+/* Дополнительные стили */
+.record-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.record-table th,
+.record-table td {
+    border: 1px solid #cccccc;
+    padding: 8px;
+    vertical-align: top;
+}
+
+.record-table th {
+    background-color: #f9f9f9;
+    text-align: left;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 10px;
 }

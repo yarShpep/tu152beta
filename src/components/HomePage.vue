@@ -1,4 +1,3 @@
-<!-- src/components/HomePage.vue -->
 <template>
   <div class="home">
     <h1>Журнал ТУ-152</h1>
@@ -62,7 +61,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .home {
   padding: 20px;
 }
