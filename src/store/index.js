@@ -1,6 +1,7 @@
+// src/store/index.js
 import { createStore } from 'vuex';
+import { v4 as uuidv4 } from 'uuid';
 
-// Функция для загрузки состояния из localStorage
 function loadState() {
     try {
         const serializedState = localStorage.getItem('vuex-state');
@@ -20,7 +21,6 @@ function loadState() {
     }
 }
 
-// Функция для сохранения состояния в localStorage
 function saveState(state) {
     try {
         const serializedState = JSON.stringify(state);
@@ -34,8 +34,9 @@ export default createStore({
     state: loadState(),
     mutations: {
         ADD_ENTRY(state, entry) {
-            state.entries.push(entry);
-            console.log('Entry added:', entry);
+            const entryWithId = { id: uuidv4(), ...entry };
+            state.entries.push(entryWithId);
+            console.log('Entry added:', entryWithId);
         },
         UPDATE_CURRENT_ENTRY(state, data) {
             state.currentEntry = { ...state.currentEntry, ...data };
@@ -45,23 +46,21 @@ export default createStore({
             state.currentEntry = {};
             console.log('Current entry reset');
         },
+        // Другие мутации
     },
     actions: {
         addEntry({ commit, state }) {
             commit('ADD_ENTRY', state.currentEntry);
             commit('RESET_CURRENT_ENTRY');
-            // Здесь можно добавить вызов к бэкенду через Axios
             console.log('Entry added via action:', state.currentEntry);
         },
+        // Другие действия
     },
     getters: {
-        // Удалите или оставьте, если вы планируете использовать
-        getEmployeeById: (state) => (id) => {
-            return state.employees.find((emp) => emp.id === id);
-        },
+        // Ваши геттеры
     },
     plugins: [
-        store => {
+        (store) => {
             store.subscribe((mutation, state) => {
                 saveState(state);
             });

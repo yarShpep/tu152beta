@@ -5,12 +5,16 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'App',
-};
-</script>
-
 <style>
-/* Глобальные стили можно также добавить здесь или импортировать из global.css */
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+}
+
+#app {
+  max-width: 100%;
+}
 </style>

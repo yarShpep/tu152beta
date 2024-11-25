@@ -142,10 +142,10 @@ export default {
         fields: [
           {
             name: 'fuelOption',
-            label: 'Выберите опцию:', // Групповая метка для радиокнопок
+            label: 'Выберите опцию:',
             type: 'radio',
             options: [
-              { value: 'fuel', label: 'Наличие топлива в момент приемки'},
+              { value: 'fuel', label: 'Наличие топлива в момент приемки' },
               { value: 'electricity', label: 'Показание счетчика электроэнергии в момент приемки' },
             ],
             optional: false,
@@ -153,7 +153,7 @@ export default {
           {
             name: 'fuelAmount',
             label: 'Количество топлива (кг)',
-            type: 'int',
+            type: 'number',
             dependency: { field: 'fuelOption', value: 'fuel' },
             optional: false,
           },
@@ -194,24 +194,30 @@ export default {
     if (!column.value) {
       console.error('Колонка не найдена для ID:', route.params.id);
       router.push('/add-entry');
+      return {}; // Завершаем функцию setup
     }
 
     // Загрузка сохранённых данных для текущего столбца
-    const formData = reactive(store.state.currentEntry[column.value.id] || {});
+    const formData = reactive({ ...store.state.currentEntry[column.value.id] });
 
     // Инициализация fuelOption, если оно не задано
     if (column.value.id === '3' && !formData.fuelOption) {
       formData.fuelOption = ''; // Или можно установить значение по умолчанию, например 'fuel'
     }
 
-    // Сохранение изменений формы в store при изменении formData
+    // Наблюдатель за fuelOption для очистки противоположного поля
     watch(
-        () => ({ ...formData }),
+        () => formData.fuelOption,
         (newVal) => {
-          store.commit('UPDATE_CURRENT_ENTRY', { [column.value.id]: { ...newVal } });
-          console.log('FormData updated:', newVal); // Отладочный лог
-        },
-        { deep: true }
+          if (newVal === 'fuel') {
+            formData.electricityReading = '';
+          } else if (newVal === 'electricity') {
+            formData.fuelAmount = '';
+          } else {
+            formData.fuelAmount = '';
+            formData.electricityReading = '';
+          }
+        }
     );
 
     // Функция проверки зависимости поля
@@ -238,7 +244,14 @@ export default {
     const formValid = computed(() => {
       return displayedFields.value.every((field) => {
         if (!field.optional) {
-          return formData[field.name];
+          const value = formData[field.name];
+          if (field.type === 'checkbox') {
+            return value !== undefined;
+          } else if (field.type === 'number') {
+            return value !== undefined && value !== null && value !== '';
+          } else {
+            return value !== undefined && value !== null && value.toString().trim() !== '';
+          }
         }
         return true;
       });
@@ -297,7 +310,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .column-form {
   padding: 20px;
 }

@@ -8,6 +8,7 @@
       <th rowspan="2">Наличие топлива в момент приемки</th>
       <th rowspan="2">Замечания и неисправности</th>
       <th rowspan="2">Дата устранения неисправности</th>
+      <th rowspan="2">Действия</th> <!-- Добавлено -->
     </tr>
     <tr>
       <th>Прибывающего (сдающего)</th>
@@ -15,7 +16,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr v-for="(entry, index) in entries" :key="index">
+    <tr v-for="(entry, index) in entries" :key="entry.id || index">
       <!-- Первый столбец -->
       <td>
         {{ entry['1'].date }}<br />
@@ -51,7 +52,8 @@
       </td>
       <!-- Пятый столбец -->
       <td>
-        Замечания и неисправности: {{ entry['4'].comments }}<br />
+        Замечания и неисправности:
+        {{ truncateText(entry['4'].comments, 100) }}<br />
         Подпись сдающего: {{ entry['4'].signatureGiven ? 'Да' : 'Нет' }}<br />
         Подпись принимающего: {{ entry['4'].signatureReceived ? 'Да' : 'Нет' }}
       </td>
@@ -61,12 +63,18 @@
         Должность: {{ entry['5'].position }}<br />
         Подпись: {{ entry['5'].signature ? 'Да' : 'Нет' }}
       </td>
+      <!-- Седьмой столбец - Действия -->
+      <td>
+        <ActionDropdown :entryId="entry.id" />
+      </td>
     </tr>
     </tbody>
   </table>
 </template>
 
 <script>
+import ActionDropdown from './ActionDropdown.vue'; // Импортируем новый компонент
+
 export default {
   name: 'RecordTable',
   props: {
@@ -74,6 +82,9 @@ export default {
       type: Array,
       required: true,
     },
+  },
+  components: {
+    ActionDropdown, // Регистрируем компонент
   },
   methods: {
     getFuelOptionLabel(option) {
@@ -86,11 +97,23 @@ export default {
           return '-';
       }
     },
+    truncateText(text, maxLength) {
+      if (text && text.length > maxLength) {
+        return text.substring(0, maxLength) + '...';
+      }
+      return text;
+    },
   },
 };
 </script>
 
+
 <style scoped>
+.record-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .record-table {
   width: 100%;
   border-collapse: collapse;
@@ -101,10 +124,20 @@ export default {
   border: 1px solid #cccccc;
   padding: 8px;
   vertical-align: top;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 200px; /* Ограничиваем ширину столбцов */
 }
 
 .record-table th {
   background-color: #f9f9f9;
   text-align: left;
+}
+
+@media (max-width: 767px) {
+  .record-table th,
+  .record-table td {
+    font-size: 12px;
+  }
 }
 </style>
