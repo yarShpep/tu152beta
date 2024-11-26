@@ -1,76 +1,150 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #ffffff;
-    color: #000000;
+/* src/styles/global.css */
+
+/* Цветовая палитра */
+:root {
+    --primary-color: #007bff;
+    --primary-color-hover: #0069d9;
+    --secondary-color: #6c757d;
+    --secondary-color-hover: #5a6268;
+    --success-color: #28a745;
+    --success-color-hover: #218838;
+    --danger-color: #dc3545;
+    --danger-color-hover: #c82333;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --text-color: #212529;
+    --background-color: #ffffff;
+    --border-color: #dee2e6;
 }
 
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Общие стили для заголовков */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--dark-color);
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: var(--dark-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+}
+
+h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: var(--dark-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 8px;
+}
+
+
+/* Общие стили для кнопок */
 button {
-    padding: 10px 20px;
+    padding: 12px 24px;
     margin: 5px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 5px;
     border: none;
     font-size: 16px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: #ffffff;
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+    background-color: var(--primary-color-hover);
 }
 
 .btn-secondary {
-    background-color: #f0f0f0;
-    color: #6c757d;
+    background-color: var(--secondary-color);
+    color: #ffffff;
 }
 
 .btn-secondary:hover {
-    background-color: #d6d6d6;
+    background-color: var(--secondary-color-hover);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    color: #ffffff;
+}
+
+.btn-success:hover {
+    background-color: var(--success-color-hover);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: #ffffff;
+}
+
+.btn-danger:hover {
+    background-color: var(--danger-color-hover);
+}
+
+/* Стили для форм */
+form {
+    background-color: var(--light-color);
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+}
+
+/* Стили для таблиц */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--background-color);
+}
+
+th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: var(--light-color);
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: var(--light-color);
+}
+
+/* Стили для ошибок */
+.error-message {
+    color: var(--danger-color);
+    background-color: #f8d7da;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
 }
 
 /* Адаптивность */
 @media (max-width: 767px) {
-    .home,
-    .add-entry,
-    .column-form {
+    body {
         padding: 10px;
     }
 
-    table,
-    th,
-    td {
-        font-size: 14px;
-    }
-
     button {
-        font-size: 14px;
+        width: 100%;
+        margin: 5px 0;
     }
-}
-
-/* Дополнительные стили */
-.record-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.record-table th,
-.record-table td {
-    border: 1px solid #cccccc;
-    padding: 8px;
-    vertical-align: top;
-}
-
-.record-table th {
-    background-color: #f9f9f9;
-    text-align: left;
-}
-
-.error-message {
-    color: red;
-    margin-bottom: 10px;
 }

@@ -34,9 +34,8 @@ export default createStore({
     state: loadState(),
     mutations: {
         ADD_ENTRY(state, entry) {
-            const entryWithId = { id: uuidv4(), ...entry };
-            state.entries.push(entryWithId);
-            console.log('Entry added:', entryWithId);
+            state.entries.unshift(entry); // Добавляем новую запись в начало массива
+            console.log('Entry added:', entry);
         },
         UPDATE_CURRENT_ENTRY(state, data) {
             state.currentEntry = { ...state.currentEntry, ...data };
@@ -46,18 +45,22 @@ export default createStore({
             state.currentEntry = {};
             console.log('Current entry reset');
         },
-        // Другие мутации
+        // Другие мутации, если есть
     },
     actions: {
         addEntry({ commit, state }) {
-            commit('ADD_ENTRY', state.currentEntry);
+            const newEntry = {
+                id: uuidv4(), // Генерируем уникальный идентификатор
+                createdAt: new Date().toISOString(), // Добавляем поле даты создания
+                ...state.currentEntry,
+            };
+            commit('ADD_ENTRY', newEntry);
             commit('RESET_CURRENT_ENTRY');
-            console.log('Entry added via action:', state.currentEntry);
         },
-        // Другие действия
+        // Другие действия, если есть
     },
     getters: {
-        // Ваши геттеры
+        // Ваши геттеры, если есть
     },
     plugins: [
         (store) => {

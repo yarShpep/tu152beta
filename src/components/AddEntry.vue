@@ -1,22 +1,25 @@
+<!-- src/components/AddEntry.vue -->
 <template>
   <div class="add-entry">
-    <h2>Добавить новую запись</h2>
-    <ul>
-      <li v-for="column in columns" :key="column.id">
-        <router-link :to="`/add-entry/column/${column.id}`">
+    <h1>Добавить новую запись</h1>
+    <ul class="column-list">
+      <li v-for="column in columns" :key="column.id" class="column-item">
+        <router-link :to="`/add-entry/column/${column.id}`" class="column-link">
           {{ column.name }}
-          <span v-if="isColumnFilled(column.id)">✔️</span>
+          <span v-if="isColumnFilled(column.id)" class="checkmark">✔️</span>
         </router-link>
       </li>
     </ul>
-    <button
-        class="btn-primary"
-        :disabled="!allColumnsFilled"
-        @click="saveEntry"
-    >
-      Сохранить
-    </button>
-    <button class="btn-secondary" @click="cancel">Отменить</button>
+    <div class="button-group">
+      <button
+          :class="['btn', allColumnsFilled ? 'btn-success' : 'btn-disabled']"
+          :disabled="!allColumnsFilled"
+          @click="saveEntry"
+      >
+        Сохранить
+      </button>
+      <button class="btn btn-secondary" @click="cancel">Отменить</button>
+    </div>
   </div>
 </template>
 
@@ -32,7 +35,7 @@ export default {
     const router = useRouter();
 
     const columns = [
-      { id: '1', name: 'Дата, время (час, мин.), станция смены локомотивной бригады' },
+      { id: '1', name: 'Дата, время, станция смены' },
       { id: '2', name: 'Фамилия машиниста' },
       { id: '3', name: 'Наличие топлива в момент приемки' },
       { id: '4', name: 'Замечания и неисправности' },
@@ -73,13 +76,99 @@ export default {
 
 <style scoped>
 .add-entry {
+  max-width: 600px;
+  margin: 0 auto;
   padding: 20px;
 }
-.add-entry ul {
+
+.add-entry h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+}
+
+.column-list {
   list-style-type: none;
   padding: 0;
+  margin-bottom: 20px;
 }
-.add-entry li {
-  margin-bottom: 10px;
+
+.column-item {
+  margin-bottom: 15px;
+}
+
+.column-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--light-color);
+  padding: 12px 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  text-decoration: none;
+  color: var(--text-color);
+  transition: background-color 0.3s ease;
+}
+
+.column-link:hover {
+  background-color: var(--primary-color-hover);
+  color: #ffffff;
+}
+
+.checkmark {
+  font-size: 20px;
+  color: var(--success-color);
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.button-group button {
+  margin-right: 10px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Стили для активной кнопки "Сохранить" */
+.btn-success {
+  background-color: var(--success-color);
+  color: #ffffff;
+}
+
+.btn-success:hover {
+  background-color: var(--success-color-hover);
+}
+
+/* Стили для неактивной кнопки "Сохранить" */
+.btn-disabled {
+  background-color: #6c757d; /* Тёмно-серый цвет */
+  color: #ffffff;
+  border: 2px solid #6c757d;
+  cursor: not-allowed;
+}
+
+.btn-disabled:hover {
+  background-color: #6c757d; /* Цвет не меняется при наведении */
+}
+
+/* Стили для кнопки "Отменить" */
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: #ffffff;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-color-hover);
 }
 </style>

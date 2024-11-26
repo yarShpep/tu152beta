@@ -27,7 +27,7 @@
               :id="field.name"
               :type="field.type"
               :required="!field.optional"
-              v-bind="field.type !== 'checkbox' ? {} : { 'aria-label': field.label }"
+              v-bind="getComponentProps(field)"
           ></component>
         </div>
       </div>
@@ -36,10 +36,16 @@
         Пожалуйста, заполните все обязательные поля.
       </div>
 
-      <button class="btn-primary" type="submit" :disabled="!formValid">
-        Сохранить
-      </button>
-      <button class="btn-secondary" type="button" @click="cancel">Отменить</button>
+      <div class="button-group">
+        <button
+            :class="['btn', formValid ? 'btn-success' : 'btn-disabled']"
+            type="submit"
+            :disabled="!formValid"
+        >
+          Сохранить
+        </button>
+        <button class="btn btn-secondary" type="button" @click="cancel">Отменить</button>
+      </div>
     </form>
   </div>
   <div v-else>
@@ -72,13 +78,13 @@ export default {
     const columns = [
       {
         id: '1',
-        name: 'Дата, время (час, мин.), станция смены локомотивной бригады',
+        name: 'Дата, время, станция смены',
         fields: [
-          { name: 'date', label: 'Дата', type: 'date', optional: false },
-          { name: 'direction', label: 'Направление', type: 'text', optional: false },
-          { name: 'train', label: 'Поезд', type: 'text', optional: false },
-          { name: 'weight', label: 'Вес (кг)', type: 'number', optional: false },
-          { name: 'axles', label: 'Оси', type: 'text', optional: false },
+          { name: 'date', label: 'Дата', type: 'date', optional: false, placeholder: 'Введите дату' },
+          { name: 'direction', label: 'Направление', type: 'text', optional: false, placeholder: 'Введите направление' },
+          { name: 'train', label: 'Поезд', type: 'text', optional: false, placeholder: 'Введите номер поезда' },
+          { name: 'weight', label: 'Вес (кг)', type: 'number', optional: false, placeholder: 'Введите вес' },
+          { name: 'axles', label: 'Оси', type: 'text', optional: false, placeholder: 'Введите количество осей' },
           { name: 'acceptanceTime', label: 'Время (Начало приемки)', type: 'time', optional: false },
         ],
       },
@@ -88,19 +94,21 @@ export default {
         subcolumns: [
           {
             id: '2.1',
-            name: 'Прибывающего (сдающего), станция, откуда прибыл и № поезда',
+            name: 'Прибывающего (сдающего)',
             fields: [
               {
                 name: 'arrivalDriver',
                 label: 'ФИО Машиниста Прибывающего',
                 type: 'text',
                 optional: false,
+                placeholder: 'Введите ФИО машиниста',
               },
               {
                 name: 'arrivalAssistant',
-                label: 'ФИО Помощника машиниста Прибывающего',
+                label: 'ФИО Помощника Прибывающего',
                 type: 'text',
                 optional: true,
+                placeholder: 'Введите ФИО помощника (опционально)',
               },
               {
                 name: 'arrivalTime',
@@ -119,12 +127,14 @@ export default {
                 label: 'ФИО Машиниста Отправляющего',
                 type: 'text',
                 optional: false,
+                placeholder: 'Введите ФИО машиниста',
               },
               {
                 name: 'departureAssistant',
-                label: 'ФИО Помощника машиниста Отправляющего',
+                label: 'ФИО Помощника Отправляющего',
                 type: 'text',
                 optional: true,
+                placeholder: 'Введите ФИО помощника (опционально)',
               },
               {
                 name: 'departureTime',
@@ -145,8 +155,8 @@ export default {
             label: 'Выберите опцию:',
             type: 'radio',
             options: [
-              { value: 'fuel', label: 'Наличие топлива в момент приемки' },
-              { value: 'electricity', label: 'Показание счетчика электроэнергии в момент приемки' },
+              { value: 'fuel', label: 'Наличие топлива' },
+              { value: 'electricity', label: 'Показание счетчика электроэнергии' },
             ],
             optional: false,
           },
@@ -156,6 +166,7 @@ export default {
             type: 'number',
             dependency: { field: 'fuelOption', value: 'fuel' },
             optional: false,
+            placeholder: 'Введите количество топлива',
           },
           {
             name: 'electricityReading',
@@ -163,6 +174,7 @@ export default {
             type: 'text',
             dependency: { field: 'fuelOption', value: 'electricity' },
             optional: false,
+            placeholder: 'Введите показание счетчика',
           },
         ],
       },
@@ -170,7 +182,7 @@ export default {
         id: '4',
         name: 'Замечания и неисправности',
         fields: [
-          { name: 'comments', label: 'Замечания и неисправности', type: 'textarea', optional: false },
+          { name: 'comments', label: 'Замечания и неисправности', type: 'textarea', optional: false, placeholder: 'Введите замечания' },
           { name: 'signatureGiven', label: 'Подпись сдающего машиниста', type: 'checkbox', optional: false },
           { name: 'signatureReceived', label: 'Подпись принимающего машиниста', type: 'checkbox', optional: false },
         ],
@@ -179,8 +191,8 @@ export default {
         id: '5',
         name: 'Дата устранения неисправности',
         fields: [
-          { name: 'repairDate', label: 'Дата устранения неисправности', type: 'date', optional: false },
-          { name: 'position', label: 'Должность лица', type: 'text', optional: false },
+          { name: 'repairDate', label: 'Дата устранения', type: 'date', optional: false },
+          { name: 'position', label: 'Должность лица', type: 'text', optional: false, placeholder: 'Введите должность' },
           { name: 'signature', label: 'Подпись', type: 'checkbox', optional: false },
         ],
       },
@@ -194,7 +206,7 @@ export default {
     if (!column.value) {
       console.error('Колонка не найдена для ID:', route.params.id);
       router.push('/add-entry');
-      return {}; // Завершаем функцию setup
+      return {};
     }
 
     // Загрузка сохранённых данных для текущего столбца
@@ -202,7 +214,7 @@ export default {
 
     // Инициализация fuelOption, если оно не задано
     if (column.value.id === '3' && !formData.fuelOption) {
-      formData.fuelOption = ''; // Или можно установить значение по умолчанию, например 'fuel'
+      formData.fuelOption = '';
     }
 
     // Наблюдатель за fuelOption для очистки противоположного поля
@@ -246,7 +258,7 @@ export default {
         if (!field.optional) {
           const value = formData[field.name];
           if (field.type === 'checkbox') {
-            return value !== undefined;
+            return value === true;
           } else if (field.type === 'number') {
             return value !== undefined && value !== null && value !== '';
           } else {
@@ -273,6 +285,21 @@ export default {
         default:
           return 'input';
       }
+    };
+
+    // Функция для получения дополнительных свойств компонента
+    const getComponentProps = (field) => {
+      const props = {};
+
+      if (field.type !== 'checkbox') {
+        if (field.placeholder) {
+          props.placeholder = field.placeholder;
+        }
+      } else {
+        props['aria-label'] = field.label;
+      }
+
+      return props;
     };
 
     const saveColumnData = () => {
@@ -302,6 +329,7 @@ export default {
       formData,
       formValid,
       getComponentType,
+      getComponentProps,
       displayedFields,
       saveColumnData,
       cancel,
@@ -312,18 +340,110 @@ export default {
 
 <style scoped>
 .column-form {
+  max-width: 600px;
+  margin: 0 auto;
   padding: 20px;
+  background-color: var(--light-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.column-form h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+}
+
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
 .group-label {
   font-weight: bold;
-  margin-bottom: 8px;
+  font-size: 16px;
+  margin-bottom: 10px;
   display: block;
 }
+
+.button-group {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.button-group button {
+  margin-right: 10px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Стили для активной кнопки "Сохранить" */
+.btn-success {
+  background-color: var(--success-color);
+  color: #ffffff;
+}
+
+.btn-success:hover {
+  background-color: var(--success-color-hover);
+}
+
+/* Стили для неактивной кнопки "Сохранить" */
+.btn-disabled {
+  background-color: #6c757d; /* Тёмно-серый цвет */
+  color: #ffffff;
+  border: 2px solid #6c757d;
+  cursor: not-allowed;
+}
+
+.btn-disabled:hover {
+  background-color: #6c757d; /* Цвет не меняется при наведении */
+}
+
+/* Стили для кнопки "Отменить" */
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: #ffffff;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-color-hover);
+}
+
 .error-message {
-  color: red;
-  margin-bottom: 10px;
+  color: var(--danger-color);
+  background-color: #f8d7da;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
 }
 </style>
