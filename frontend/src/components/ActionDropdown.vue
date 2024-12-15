@@ -4,6 +4,7 @@
     <button class="dropdown-button">Действия</button>
     <div v-if="isOpen" class="dropdown-menu">
       <button class="dropdown-item" @click.stop="viewEntry">Просмотреть</button>
+      <button class="dropdown-item" @click.stop="deleteEntry">Удалить</button>
       <!-- Добавьте другие действия здесь -->
     </div>
   </div>
@@ -12,18 +13,20 @@
 <script>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 export default {
   name: 'ActionDropdown',
   props: {
     entryId: {
-      type: String,
+      type: [String, Number], // Поддержка как строк, так и чисел
       required: true,
     },
   },
   setup(props) {
     const isOpen = ref(false);
     const router = useRouter();
+    const store = useStore();
 
     const toggleDropdown = () => {
       isOpen.value = !isOpen.value;
@@ -32,6 +35,19 @@ export default {
     const viewEntry = () => {
       isOpen.value = false; // Закрываем выпадающее меню
       router.push(`/view-entry/${props.entryId}`);
+    };
+
+    const deleteEntry = async () => {
+      if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+        try {
+          await store.dispatch('deleteEntry', props.entryId);
+          isOpen.value = false;
+          alert('Запись успешно удалена.');
+        } catch (error) {
+          console.error('Ошибка при удалении записи:', error);
+          alert('Не удалось удалить запись. Попробуйте позже.');
+        }
+      }
     };
 
     const handleClickOutside = (event) => {
@@ -52,6 +68,7 @@ export default {
       isOpen,
       toggleDropdown,
       viewEntry,
+      deleteEntry,
     };
   },
 };

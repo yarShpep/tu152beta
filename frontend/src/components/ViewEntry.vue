@@ -3,28 +3,41 @@
   <div class="view-entry">
     <button class="btn-secondary" @click="goBack">&lt; Назад</button>
     <h2>Просмотр записи</h2>
-    <div v-if="filteredEntry">
+
+    <div v-if="isLoading">
+      <p>Загрузка...</p>
+    </div>
+
+    <div v-else-if="filteredEntry">
       <!-- Используем filteredEntry для отображения -->
       <div
           v-for="(columnData, columnId) in filteredEntry"
-          :key="columnId"
+          :key="`column-${columnId}`"
       >
         <h3>{{ getColumnName(columnId) }}</h3>
-        <div v-for="(value, key) in columnData" :key="key">
+        <div
+            v-for="(value, key) in columnData"
+            :key="`field-${columnId}-${key}`"
+        >
           <strong>{{ getFieldLabel(columnId, key) }}:</strong>
           {{ formatValue(value, key) }}
         </div>
       </div>
     </div>
+
     <div v-else>
       <p>Запись не найдена.</p>
+    </div>
+
+    <div v-if="error" class="error-message">
+      {{ error }}
     </div>
   </div>
 </template>
 
 <script>
 import { useRoute, useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
 export default {
@@ -36,11 +49,13 @@ export default {
 
     const entryId = route.params.id;
 
+    const isLoading = ref(false);
+    const error = ref(null);
+
     const entry = computed(() =>
         store.state.entries.find((e) => e.id === entryId)
     );
 
-    // Определяем список допустимых колонок, исключая 6-й столбец с id '5'
     const columns = [
       {
         id: '1',
@@ -99,20 +114,18 @@ export default {
       // Убираем столбец с id '5' (6-й столбец)
     ];
 
-    // Создаём список допустимых ключей колонок
     const allowedColumnIds = columns.map((col) => col.id);
 
-    // Фильтруем entry, оставляя только допустимые колонки
     const filteredEntry = computed(() => {
       if (!entry.value) return null;
 
       const newEntry = {};
 
-      for (const key of allowedColumnIds) {
-        if (Object.prototype.hasOwnProperty.call(entry.value, key)) {
-          newEntry[key] = entry.value[key];
+      allowedColumnIds.forEach((columnId) => {
+        if (entry.value[columnId]) {
+          newEntry[columnId] = entry.value[columnId];
         }
-      }
+      });
 
       return newEntry;
     });
@@ -125,16 +138,16 @@ export default {
     const getFieldLabel = (columnId, fieldName) => {
       const column = columns.find((col) => col.id === columnId);
       if (column) {
-        let field;
         if (column.fields) {
-          field = column.fields.find((f) => f.name === fieldName);
-        } else if (column.subcolumns) {
+          const field = column.fields.find((f) => f.name === fieldName);
+          if (field) return field.label;
+        }
+        if (column.subcolumns) {
           for (const subcol of column.subcolumns) {
-            field = subcol.fields.find((f) => f.name === fieldName);
-            if (field) break;
+            const field = subcol.fields.find((f) => f.name === fieldName);
+            if (field) return field.label;
           }
         }
-        return field ? field.label : fieldName;
       }
       return fieldName;
     };
@@ -148,12 +161,28 @@ export default {
             ? 'Наличие топлива в момент приемки'
             : 'Показание счетчика электроэнергии в момент приемки';
       }
-      return value || '-';
+      return value ? value : '-';
     };
 
     const goBack = () => {
       router.push('/');
     };
+
+    onMounted(async () => {
+      isLoading.value = true;
+      try {
+        // Предполагается, что данные уже загружены в Vuex
+        // Если данные загружаются асинхронно, вызовите соответствующее действие Vuex
+        // Например:
+        // await store.dispatch('fetchEntry', entryId);
+        // Здесь мы предполагаем, что данные уже присутствуют
+      } catch (err) {
+        error.value = 'Не удалось загрузить запись.';
+        console.error(err);
+      } finally {
+        isLoading.value = false;
+      }
+    });
 
     return {
       entry,
@@ -162,6 +191,8 @@ export default {
       getFieldLabel,
       formatValue,
       goBack,
+      isLoading,
+      error,
     };
   },
 };
@@ -190,5 +221,10 @@ export default {
 .btn-secondary {
   margin-bottom: 20px;
   border-radius: 50px;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
 }
 </style>

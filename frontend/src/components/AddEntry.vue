@@ -43,20 +43,35 @@ export default {
       // Добавьте остальные столбцы, если необходимо
     ];
 
+    // Проверка заполненности столбца
     const isColumnFilled = (columnId) => {
-      return store.state.currentEntry[columnId] !== undefined;
+      return (
+          store.state.currentEntry[columnId] !== undefined &&
+          store.state.currentEntry[columnId] !== ''
+      );
     };
 
+    // Проверка, заполнены ли все столбцы
     const allColumnsFilled = computed(() => {
       return columns.every((column) => isColumnFilled(column.id));
     });
 
-    const saveEntry = () => {
+    // Получение текущей записи из хранилища
+    const currentEntry = computed(() => store.state.currentEntry);
+
+    // Метод для сохранения записи
+    const saveEntry = async () => {
       console.log('Кнопка "Сохранить" на странице AddEntry нажата');
-      store.dispatch('addEntry');
-      router.push('/');
+      try {
+        await store.dispatch('addEntry', currentEntry.value);
+        router.push('/');
+      } catch (error) {
+        console.error('Ошибка при сохранении записи:', error);
+        alert('Не удалось сохранить запись. Проверьте введённые данные и попробуйте снова.');
+      }
     };
 
+    // Метод для отмены добавления записи
     const cancel = () => {
       console.log('Кнопка "Отменить" на странице AddEntry нажата');
       store.commit('RESET_CURRENT_ENTRY');

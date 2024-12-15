@@ -1,15 +1,22 @@
 <!-- src/components/SelectComponent.vue -->
 <template>
-  <select v-model="internalValue" :id="id">
-    <option value="" disabled>Выберите</option>
-    <option
+  <div>
+    <label
         v-for="option in optionsList"
         :key="option.id || option"
-        :value="option.id || option"
+        :for="`${id}-${option.id || option}`"
+        class="select-label"
     >
+      <input
+          type="radio"
+          :id="`${id}-${option.id || option}`"
+          :value="option.id || option"
+          :name="id"
+          v-model="internalValue"
+      />
       {{ option.name || option }}
-    </option>
-  </select>
+    </label>
+  </div>
 </template>
 
 <script>
@@ -27,6 +34,9 @@ export default {
     options: {
       type: String, // 'employees' or 'positions'
       required: true,
+      validator(value) {
+        return ['employees', 'positions'].includes(value);
+      },
     },
   },
   computed: {
@@ -38,19 +48,26 @@ export default {
       }
       return [];
     },
-  },
-  emits: ['update:modelValue'],
-  methods: {
-    updateValue(event) {
-      this.$emit('update:modelValue', event.target.value);
+    internalValue: {
+      get() {
+        return this.modelValue;
+      },
+      set(value) {
+        this.$emit('update:modelValue', value);
+      },
     },
   },
 };
 </script>
 
 <style scoped>
-select {
-  width: 100%;
-  padding: 8px;
+.select-label {
+  display: block;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.select-label input {
+  margin-right: 8px;
 }
 </style>
